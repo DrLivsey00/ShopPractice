@@ -3,20 +3,23 @@ package server
 import (
 	"github.com/DrLivsey00/ShopPraactice/internal/handlers"
 	"github.com/DrLivsey00/ShopPraactice/pkg/database"
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/cors"
+	"github.com/gofiber/fiber/v3/middleware/logger"
 	"log"
 )
+
+var Sessions *session.Store
 
 func Run(db *database.DB) {
 	app := fiber.New()
 
 	app.Use(logger.New())
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
-		AllowHeaders: "Origin,Content-Type,Accept,Content-Length,Accept-Language,Accept-Encoding,X-CSRF-Token,Authorization",
-		AllowMethods: "GET,POST,PATCH,DELETE",
+		AllowOrigins: []string{"*"},
+		AllowHeaders: []string{"Origin,Content-Type,Accept,Content-Length,Accept-Language,Accept-Encoding,X-CSRF-Token,Authorization"},
+		AllowMethods: []string{"GET,POST,PATCH,DELETE"},
 	}))
 
 	app.Get("/", handlers.HomeHandler) //main page of shop
@@ -24,11 +27,13 @@ func Run(db *database.DB) {
 	//user routes
 
 	user := app.Group("/user")
-	user.Get("", handlers.UserInfo)                // get user info
-	user.Patch("/change", handlers.ChangeUserInfo) // change name or bio
-	user.Post("/register", handlers.RegisterUser)  // change name or bio
-	user.Post("/login", handlers.LoginUser)        //login to system
-	user.Post("/logout", handlers.LogoutUser)      //logout
+	user.Get("", handlers.HomeHandler)                   // get user info
+	user.Patch("/change_name", handlers.ChangeUserInfo)  // change name or bio
+	user.Patch("/change_bio", handlers.ChangeUserInfo)   // change name or bio
+	user.Patch("/change_email", handlers.ChangeUserInfo) // change name or bio
+	user.Post("/register", handlers.RegisterUser)        // change name or bio
+	user.Post("/login", handlers.LoginUser)              //login to system
+	user.Post("/logout", handlers.LogoutUser)            //logout
 
 	//admin routes
 	admin := app.Group("/admin")
@@ -42,6 +47,8 @@ func Run(db *database.DB) {
 	device.Get("/:id", handlers.HomeHandler) //get info about device
 
 	handlers.Handlersinit(db)
+
+	Sessions = session.New()
 
 	log.Fatal(app.Listen(":8080"))
 

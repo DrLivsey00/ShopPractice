@@ -19,3 +19,13 @@ func (db *DB) RegisterUser(username, password, bio, email string, createdAt time
 	}
 	return nil
 }
+
+func (db *DB) SetSessionToken(username, sessionToken string) error {
+	_, err := db.Conn.Exec(
+		context.Background(), "UPDATE users SET session_token = $1 WHERE username = $2", sessionToken, username,
+	)
+	if err != nil {
+		log.Println(err)
+	}
+	return nil
+}
