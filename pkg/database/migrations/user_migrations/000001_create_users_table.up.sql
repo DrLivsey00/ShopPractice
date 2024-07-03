@@ -5,6 +5,8 @@ Create table users(
     user_password text not null,
     user_bio text,
     user_access_level int default 0 not null ,
+    session_token text unique not null,
+    jwt_token text unique not null,
     created_at timestamp not null,
     updated_at timestamp not null
 )

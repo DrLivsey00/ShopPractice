@@ -6,12 +6,12 @@ import (
 	"time"
 )
 
-func (db *DB) RegisterUser(username, password, bio, email string, createdAt time.Time) error {
+func (db *DB) RegisterUser(username, password, bio, email, sessionToken, jwtToken string, createdAt time.Time) error {
 
 	_, err := db.Conn.Exec(
 		context.Background(),
-		"INSERT INTO users (user_name, user_password, user_email, user_bio, user_access_level, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-		username, password, email, bio, 0, createdAt, createdAt,
+		"INSERT INTO users (user_name, user_password, user_email, user_bio, user_access_level,session_token,jwt_token, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+		username, password, email, bio, 0, sessionToken, jwtToken, createdAt, createdAt,
 	)
 	if err != nil {
 		log.Println(err)
